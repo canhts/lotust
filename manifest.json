@@ -1,0 +1,26 @@
+{
+  "name": "Mầm Non Hoa Sen",
+  "short_name": "Hoa Sen",
+  "description": "Ứng dụng điểm danh mầm non",
+  "id": "com.hoasen.attendance",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fff1f2",
+  "theme_color": "#f43f5e",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/logo.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/logo.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["education", "productivity"]
+}

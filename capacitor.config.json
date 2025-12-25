@@ -1,0 +1,13 @@
+{
+  "appId": "com.hoasen.attendance",
+  "appName": "Mầm Non Hoa Sen",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  }
+}

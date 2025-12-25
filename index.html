@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <base href="./">
+
+  <!-- Force HTTPS -->
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <script>
+    if (window.location.protocol === 'http:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      window.location.href = window.location.href.replace('http:', 'https:');
+    }
+  </script>
+
+  <meta name="theme-color" content="#f43f5e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Hoa Sen">
+  <meta name="application-name" content="Mầm Non Hoa Sen">
+  
+  <title>Mầm Non Hoa Sen - Điểm Danh</title>
+  
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/logo.svg">
+  <link rel="shortcut icon" href="assets/logo.svg" type="image/svg+xml">
+  
+  <link rel="preload" as="image" href="assets/logo.svg">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f8fafc;
+      -webkit-tap-highlight-color: transparent;
+      margin: 0;
+      padding: 0;
+      overscroll-behavior-y: contain;
+      position: fixed;
+      width: 100%;
+      height: 100%;
+    }
+    .liquid-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: radial-gradient(at 0% 0%, #fff1f2 0, transparent 50%), 
+                  radial-gradient(at 100% 0%, #eff6ff 0, transparent 50%), 
+                  radial-gradient(at 50% 100%, #f0fdf4 0, transparent 50%);
+      background-size: 200% 200%;
+      animation: gradient-move 20s ease infinite;
+    }
+    @keyframes gradient-move {
+      0% { background-position: 0% 50% }
+      50% { background-position: 100% 50% }
+      100% { background-position: 0% 50% }
+    }
+    .glass-nav {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    #splash-screen {
+      transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes logo-breath {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 10px 15px rgba(244, 63, 94, 0.2)); }
+      50% { transform: scale(1.05); filter: drop-shadow(0 20px 25px rgba(244, 63, 94, 0.4)); }
+    }
+    .animate-logo-breath {
+      animation: logo-breath 3s ease-in-out infinite;
+    }
+
+    /* Progress Bar Styles */
+    .loading-container {
+      width: 200px;
+      margin-top: 2rem;
+    }
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      background-color: #ffe4e6; /* rose-100 */
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #fb7185 0%, #e11d48 100%); /* rose-400 to rose-600 */
+      width: 0%;
+      border-radius: 999px;
+      transition: width 0.2s linear;
+      box-shadow: 0 0 10px rgba(225, 29, 72, 0.5);
+    }
+    .progress-text {
+      margin-top: 0.75rem;
+      font-size: 11px;
+      font-weight: 800;
+      color: #e11d48; /* rose-600 */
+      letter-spacing: 0.1em;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+    #reload-btn {
+      display: none;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: white;
+      color: #e11d48;
+      border: 1px solid #e11d48;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      cursor: pointer;
+    }
+  </style>
+<script type="importmap">
+{
+  "imports": {
+    "rxjs": "https://esm.sh/rxjs@^7.8.2?conditions=es2015",
+    "rxjs/operators": "https://esm.sh/rxjs@^7.8.2/operators?conditions=es2015",
+    "rxjs/ajax": "https://esm.sh/rxjs@^7.8.2/ajax?conditions=es2015",
+    "rxjs/webSocket": "https://esm.sh/rxjs@^7.8.2/webSocket?conditions=es2015",
+    "rxjs/testing": "https://esm.sh/rxjs@^7.8.2/testing?conditions=es2015",
+    "rxjs/fetch": "https://esm.sh/rxjs@^7.8.2/fetch?conditions=es2015",
+    "@angular/compiler": "https://esm.sh/@angular/compiler@^21.0.6?external=rxjs",
+    "@angular/platform-browser": "https://esm.sh/@angular/platform-browser@^21.0.6?external=rxjs",
+    "@angular/core": "https://esm.sh/@angular/core@^21.0.6?external=rxjs",
+    "@angular/common": "https://esm.sh/@angular/common@^21.0.6?external=rxjs",
+    "@angular/forms": "https://esm.sh/@angular/forms@^21.0.6?external=rxjs"
+  }
+}
+</script>
+</head>
+<body class="h-screen w-screen overflow-hidden select-none">
+  
+  <!-- Splash Screen -->
+  <div id="splash-screen" class="fixed inset-0 z-[9999] bg-[#fff1f2] flex flex-col items-center justify-center">
+    <div class="relative mb-6">
+      <div class="absolute inset-0 bg-rose-400 rounded-full blur-2xl opacity-20 animate-pulse"></div>
+      <img src="assets/logo.svg" 
+           fetchpriority="high" 
+           class="w-32 h-32 relative z-10 animate-logo-breath drop-shadow-xl" 
+           alt="Hoa Sen Logo"
+           onerror="this.style.display='none'; document.getElementById('fallback-icon').style.display='block'">
+      <span id="fallback-icon" class="material-icons-round text-8xl text-rose-500 relative z-10 animate-logo-breath hidden">local_florist</span>
+    </div>
+    
+    <!-- Progress Section -->
+    <div class="loading-container flex flex-col items-center">
+      <div class="progress-track">
+        <div id="app-progress-bar" class="progress-bar"></div>
+      </div>
+      <div class="flex items-center gap-1 progress-text">
+        <span id="app-progress-text">0%</span>
+      </div>
+      <p class="text-[9px] font-bold text-rose-300 uppercase tracking-[0.2em] mt-1 opacity-70">Đang khởi tạo...</p>
+      
+      <!-- Emergency Reload Button -->
+      <button id="reload-btn" onclick="window.location.reload(true)">
+        Tải lại ứng dụng
+      </button>
+    </div>
+
+    <div class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-white to-transparent opacity-50"></div>
+  </div>
+
+  <!-- Loading Simulation Logic -->
+  <script>
+    (function() {
+      let progress = 0;
+      const bar = document.getElementById('app-progress-bar');
+      const text = document.getElementById('app-progress-text');
+      const splash = document.getElementById('splash-screen');
+      const reloadBtn = document.getElementById('reload-btn');
+      
+      const updateUI = (val) => {
+        if (bar) bar.style.width = val + '%';
+        if (text) text.textContent = Math.round(val) + '%';
+      };
+
+      const interval = setInterval(() => {
+        if (progress < 60) {
+          progress += Math.random() * 5; 
+        } else if (progress < 85) {
+          progress += Math.random() * 2; 
+        } else if (progress < 95) {
+          progress += Math.random() * 0.5; 
+        }
+        
+        if (progress > 95) progress = 95;
+        updateUI(progress);
+      }, 100);
+
+      window.finishSplashLoading = () => {
+        clearInterval(interval);
+        updateUI(100);
+        
+        setTimeout(() => {
+          if (splash) {
+            splash.style.opacity = '0';
+            splash.style.pointerEvents = 'none';
+            setTimeout(() => splash.remove(), 600);
+          }
+        }, 400);
+      };
+
+      // Show reload button if stuck for 5 seconds
+      setTimeout(() => {
+        if (reloadBtn) reloadBtn.style.display = 'block';
+      }, 5000);
+
+      // Force remove splash if stuck for 8 seconds
+      setTimeout(() => {
+        if (splash && splash.parentElement) {
+             console.warn('Force removing splash screen');
+             splash.style.opacity = '0';
+             splash.style.pointerEvents = 'none';
+             setTimeout(() => splash.remove(), 600);
+        }
+      }, 8000);
+    })();
+  </script>
+
+  <div class="liquid-bg"></div>
+  <app-root></app-root>
+  
+  <script type="module" src="index.tsx"></script>
+</body>
+</html>
