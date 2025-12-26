@@ -25,8 +25,8 @@ declare var XLSX: any;
         </div>
       }
 
-      <!-- Fixed Search/Add Bar - Moved up to top-[72px] to touch menu bottom exactly -->
-      <div class="fixed top-[72px] inset-x-0 z-[100] px-6 flex justify-center pointer-events-none" [class.opacity-20]="!isToday()">
+      <!-- Fixed Search/Add Bar - Positioned to sit just below the main navigation menu -->
+      <div class="fixed top-[80px] inset-x-0 z-[100] px-6 flex justify-center pointer-events-none" [class.opacity-20]="!isToday()">
         <div class="w-full max-w-sm pointer-events-auto">
           <div class="relative p-3.5 glass-nav rounded-[28px] shadow-xl shadow-slate-900/5 border-white/10" [class.animate-slide-down]="isToday()">
             <div class="space-y-4">
@@ -60,8 +60,8 @@ declare var XLSX: any;
         </div>
       </div>
 
-      <!-- Main List - Reduced padding top to pt-[130px] to match new header position -->
-      <div class="px-5 space-y-3 relative z-10 animate-fade-in pt-[130px]" [class.opacity-40]="!isToday()">
+      <!-- Main List - Padding top adjusted to account for the fixed search/add bar above -->
+      <div class="px-5 space-y-3 relative z-10 animate-fade-in pt-48" [class.opacity-40]="!isToday()">
         <div class="flex items-center justify-between gap-1.5 mb-1.5 mx-2">
           <div class="flex items-center gap-1.5">
             <h4 class="text-[8px] font-black text-slate-400 uppercase tracking-widest">

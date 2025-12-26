@@ -25,9 +25,9 @@ type AppTab = 'attendance' | 'students' | 'history' | 'info';
       <header class="fixed top-4 left-0 right-0 px-4 z-[110]">
         
         <!-- Navigation Menu (Full Width stretched) -->
-        <div class="w-full glass-nav rounded-full p-1 flex items-center justify-around shadow-lg border-white/40 h-14">
+        <div class="w-full glass-nav rounded-full p-1 flex items-center justify-around shadow-xl border-white/40 h-16">
           <button (click)="trySetTab('attendance')"
-            class="relative flex-1 h-12 flex items-center justify-center rounded-full transition-all duration-300">
+            class="relative flex-1 h-14 flex items-center justify-center rounded-full transition-all duration-300">
             <div [class]="store.currentTab() === 'attendance' ? 'bg-white/45 border border-white/50 scale-100 shadow-sm' : 'scale-0 opacity-0'" 
                  class="absolute inset-0 rounded-full transition-all duration-300"></div>
             <span class="material-icons-round text-xl relative z-10"
@@ -35,7 +35,7 @@ type AppTab = 'attendance' | 'students' | 'history' | 'info';
           </button>
 
           <button (click)="trySetTab('history')"
-            class="relative flex-1 h-12 flex items-center justify-center rounded-full transition-all duration-300">
+            class="relative flex-1 h-14 flex items-center justify-center rounded-full transition-all duration-300">
              <div [class]="store.currentTab() === 'history' ? 'bg-white/45 border border-white/50 scale-100 shadow-sm' : 'scale-0 opacity-0'" 
                  class="absolute inset-0 rounded-full transition-all duration-300"></div>
             <span class="material-icons-round text-xl relative z-10"
@@ -43,7 +43,7 @@ type AppTab = 'attendance' | 'students' | 'history' | 'info';
           </button>
 
           <button (click)="trySetTab('students')"
-            class="relative flex-1 h-12 flex items-center justify-center rounded-full transition-all duration-300">
+            class="relative flex-1 h-14 flex items-center justify-center rounded-full transition-all duration-300">
              <div [class]="store.currentTab() === 'students' ? 'bg-white/45 border border-white/50 scale-100 shadow-sm' : 'scale-0 opacity-0'" 
                  class="absolute inset-0 rounded-full transition-all duration-300"></div>
             <span class="material-icons-round text-xl relative z-10"
@@ -51,7 +51,7 @@ type AppTab = 'attendance' | 'students' | 'history' | 'info';
           </button>
 
           <button (click)="trySetTab('info')"
-            class="relative flex-1 h-12 flex items-center justify-center rounded-full transition-all duration-300">
+            class="relative flex-1 h-14 flex items-center justify-center rounded-full transition-all duration-300">
              <div [class]="store.currentTab() === 'info' ? 'bg-white/45 border border-white/50 scale-100 shadow-sm' : 'scale-0 opacity-0'" 
                  class="absolute inset-0 rounded-full transition-all duration-300"></div>
             <span class="material-icons-round text-xl relative z-10"
@@ -61,8 +61,8 @@ type AppTab = 'attendance' | 'students' | 'history' | 'info';
       </header>
 
       <!-- Main Content Area -->
-      <!-- Adjusted pt-24 to pt-[72px] (Exact touch: top 16px + height 56px = 72px) -->
-      <main class="flex-1 overflow-y-auto no-scrollbar relative z-10 h-full transition-all duration-500 pt-[72px]">
+      <!-- Adjusted padding top to 80px to sit just below the new, taller header (top 16px + height 64px) -->
+      <main class="flex-1 overflow-y-auto no-scrollbar relative z-10 h-full transition-all duration-500 pt-[80px]">
         @switch (store.currentTab()) {
           @case ('attendance') { <app-attendance-view class="block animate-fade-in pb-12"/> }
           @case ('history') { <app-history-view class="block animate-fade-in pb-12"/> }

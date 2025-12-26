@@ -69,39 +69,41 @@ import { StoreService, AttendanceEntry } from '../services/store.service';
             </div>
           </div>
 
-          <!-- Row 3: Class Tabs (MATCHING STUDENT MANAGER STYLE) -->
-          <div class="flex flex-wrap justify-center gap-1.5">
+          <!-- Row 3: Class Tabs with Individual Stats -->
+          <div class="grid grid-cols-4 gap-2">
             @for (cls of store.classes; track cls.id) {
-              <button (click)="selectedClass.set(cls.id)" 
-                [class]="selectedClass() === cls.id 
-                  ? 'bg-white/45 border-white/50 scale-105 shadow-sm ' + cls.activeTextColor
-                  : 'bg-white/10 text-slate-400 border-white/10'" 
-                class="px-3.5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all duration-300 border active:scale-95">
-                {{ cls.name }}
+              @let stats = allClassesSavedStats()[cls.id];
+              <button 
+                (click)="selectedClass.set(cls.id)"
+                [class]="selectedClass() === cls.id ? 'bg-white/45 border-white/50 shadow-md scale-105' : 'bg-white/10 border-transparent'"
+                class="flex flex-col items-center justify-center gap-1.5 rounded-2xl py-2 transition-all duration-200 border active:scale-95">
+                
+                <span 
+                  [class]="selectedClass() === cls.id ? cls.activeTextColor : 'text-slate-400'"
+                  class="text-[9px] font-black uppercase tracking-widest transition-colors">
+                  {{ cls.name }}
+                </span>
+                
+                <div class="flex items-baseline gap-1 font-bold">
+                  <span class="text-emerald-700 font-black text-sm leading-none">{{ stats.present ?? '-' }}</span>
+                  <span class="text-slate-400 font-medium text-xs leading-none">/</span>
+                  <span class="text-slate-600 text-sm leading-none">{{ stats.total ?? '-' }}</span>
+                </div>
               </button>
             }
           </div>
 
-          <!-- Row 4: Class Specific Stats & Actions (No background container) -->
-          <!-- NOW USES classStats() which tracks SAVED data only -->
-          <div class="relative flex items-center justify-center h-6">
-            <!-- Just the numbers, floating -->
-            <div class="flex items-center gap-4 text-[11px] font-bold opacity-80">
-              <span class="text-emerald-700">{{ classStats().present ?? '-' }}</span>
-              <span class="text-slate-300 font-light">|</span>
-              <span class="text-rose-600">{{ classStats().absent ?? '-' }}</span>
-              <span class="text-slate-300 font-light">|</span>
-              <span class="text-slate-600">{{ classStats().total ?? '-' }}</span>
+          <!-- Row 4: Select All Button -->
+          @if (studentsInClass().length > 0) {
+            <div class="flex items-center justify-center pt-2">
+                <button (click)="toggleAll()" 
+                        [class]="allPresent() ? 'bg-emerald-500 text-white border-transparent shadow-lg shadow-emerald-200' : 'bg-white/20 text-slate-500 border-white/20'"
+                        class="px-5 py-2 rounded-full flex items-center justify-center gap-2 border transition-all active:scale-90 shadow-sm backdrop-blur-sm text-[9px] font-black uppercase tracking-widest">
+                    <span class="material-icons-round text-sm">done_all</span>
+                    <span>{{ allPresent() ? 'Bỏ chọn tất cả' : 'Chọn tất cả' }}</span>
+                </button>
             </div>
-            
-            @if (studentsInClass().length > 0) {
-              <button (click)="toggleAll()" 
-                      [class]="allPresent() ? 'bg-emerald-500 text-white border-transparent shadow-lg shadow-emerald-200' : 'bg-white/20 text-slate-500 border-white/20'" 
-                      class="absolute right-1 h-7 w-9 rounded-full flex items-center justify-center border transition-all active:scale-90 shadow-sm backdrop-blur-sm">
-                <span class="material-icons-round text-sm">done_all</span>
-              </button>
-            }
-          </div>
+          }
         </div>
       </div>
 
@@ -216,24 +218,38 @@ export class AttendanceViewComponent {
     };
   });
 
-  // NEW: Calculate Class-specific Stats based on SAVED DATA
-  classStats = computed(() => {
+  // Calculate saved stats for ALL classes for the selected date
+  allClassesSavedStats = computed(() => {
     const date = this.store.currentDate();
-    const selectedClsId = this.selectedClass();
     const dayRecord = this.store.attendance()[date];
+    
+    const baseStats: { [key: string]: { present: number | null, total: number | null } } = {
+      mam: { present: null, total: null },
+      choi: { present: null, total: null },
+      la: { present: null, total: null },
+      hoa: { present: null, total: null },
+    };
 
     if (!dayRecord) {
-      return { present: null, absent: null, total: null };
+      return baseStats;
     }
-
-    const classEntries = (Object.values(dayRecord) as AttendanceEntry[]).filter(
-      entry => entry.classId === selectedClsId
-    );
-
-    const total = classEntries.length;
-    const present = classEntries.filter(entry => entry.present).length;
     
-    return { present, absent: total - present, total };
+    // Initialize with 0s since we have a record
+    this.store.classes.forEach(cls => {
+        baseStats[cls.id] = { present: 0, total: 0 };
+    });
+    
+    for (const entry of Object.values(dayRecord) as AttendanceEntry[]) {
+      const classStat = baseStats[entry.classId];
+      if (classStat) {
+        classStat.total!++;
+        if (entry.present) {
+          classStat.present!++;
+        }
+      }
+    }
+    
+    return baseStats;
   });
 
   studentsInClass = computed(() => {
