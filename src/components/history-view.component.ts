@@ -10,8 +10,8 @@ declare var XLSX: any;
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <!-- Thêm pt-6 để tạo khoảng cách với menu -->
-    <div class="flex flex-col text-slate-800 px-5 pt-6">
+    <!-- Tăng pt-10 để tạo khoảng cách an toàn với menu -->
+    <div class="flex flex-col text-slate-800 px-5 pt-10">
       @let data = historyData();
 
       <div class="flex items-center justify-between px-3 mb-4 opacity-40">
@@ -19,7 +19,7 @@ declare var XLSX: any;
         <span class="text-[8px] font-black uppercase tracking-[0.2em] italic">14 ngày gần nhất</span>
       </div>
 
-      <div class="space-y-3 pb-20">
+      <div class="space-y-3 pb-28">
         @for (day of data; track day.date) {
           <div [class]="day.total === null ? 'opacity-50 grayscale-[0.5]' : ''"
                class="glass-card rounded-3xl py-4 px-5 flex items-center justify-between border-white shadow-sm transition-all relative overflow-hidden">
